@@ -1,0 +1,52 @@
+{
+  "name": "material-ui-nextjs-ts",
+  "version": "5.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "post-update": "echo \"codesandbox preview only, need an update\" && pnpm update --latest"
+  },
+  "dependencies": {
+    "@emotion/cache": "latest",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.16.13",
+    "@mui/material": "^5.16.13",
+    "@mui/material-nextjs": "^5.16.13",
+    "@mui/system": "^5.16.13",
+    "@types/bcrypt": "^5.0.2",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.9.1",
+    "next": "^14.2.20",
+    "react": "^18.3.1",
+    "react-big-calendar": "^1.17.1",
+    "react-dom": "^18.3.1",
+    "react-responsive-carousel": "^3.2.23"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9",
+    "@types/node": "^22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-big-calendar": "^1.16.0",
+    "@types/react-dom": "latest",
+    "@types/react-typical": "^0.1.2",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "npm@9.8.0"
+}
