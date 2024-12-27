@@ -32,16 +32,20 @@ export async function POST(request: NextRequest) {
     if (!process.env.JWT_SECRET) {
       throw new Error("JWT_SECRET is not defined");
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     return NextResponse.json(
       { message: "Login successful", token },
       {
         status: 200,
         headers: {
-          "Set-Cookie": `token=${token}; HttpOnly; Path=/; Secure; SameSite=Strict`,
+          "Set-Cookie": `token=${token}; HttpOnly; Path=/; SameSite=Strict`,
         },
       }
     );

@@ -17,6 +17,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ResponsiveAppBar } from "@/components/layout/Navbar";
 import { useSnackbar } from "../hooks/Snackbar";
+import { useAppContext } from "@/context/useAppContext";
 
 interface Errors {
   email?: string;
@@ -30,6 +31,7 @@ interface SnackbarState {
 }
 
 export default function Login() {
+  const { userId } = useAppContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Errors>({});
@@ -68,7 +70,7 @@ export default function Login() {
     }
 
     try {
-      const response = await axios.post("/api/users/login", {
+      const response = await axios.post("/api/auth", {
         email,
         password,
       });

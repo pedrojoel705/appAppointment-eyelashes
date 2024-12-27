@@ -3,8 +3,12 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { SocialMediaList } from "@/components/layout/SocialMediaList";
 import { ResponsiveAppBar } from "@/components/layout/Navbar";
+import { useAppContext } from "../context/useAppContext";
 
 export default function Home() {
+  const { userId } = useAppContext();
+  console.log(userId);
+
   return (
     <Grid container>
       {/* NavBar */}

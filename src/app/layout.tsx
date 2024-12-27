@@ -6,6 +6,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "@/theme";
 import { Box } from "@mui/system";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
+import { AppContextProvider } from "@/context/AppContextProvider";
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
@@ -19,15 +20,17 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         />
       </head>
       <body>
-        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Box sx={{ bgcolor: "#e7dfd8", height: "100%" }}>
-              {props.children}
-            </Box>
-            <ConditionalFooter />
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+        <AppContextProvider>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Box sx={{ bgcolor: "#e7dfd8", height: "100%" }}>
+                {props.children}
+              </Box>
+              <ConditionalFooter />
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </AppContextProvider>
       </body>
     </html>
   );
