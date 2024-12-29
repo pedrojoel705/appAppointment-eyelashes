@@ -3,8 +3,11 @@ import dbConnect from "@/lib/dbConnect";
 import { NextRequest } from "next/server";
 
 import { jwtVerify } from "jose";
-import { User } from "@/models";
+
 import { IUserPayload } from "@/interface/IUserPayload";
+import { UserModel } from "@/models";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest, response: NextResponse) {
   await dbConnect();
@@ -31,7 +34,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
       );
     }
 
-    const user = await User.findById(payload.userId);
+    const user = await UserModel.findById(payload.userId);
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

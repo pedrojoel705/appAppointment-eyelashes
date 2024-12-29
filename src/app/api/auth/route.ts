@@ -1,7 +1,7 @@
-import { User } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { UserModel } from "@/models";
 
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json();
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await User.findOne({ email });
+    const user = await UserModel.findOne({ email });
     if (!user) {
       return NextResponse.json(
         { error: "Algunos de los datos ingresados son incorrectos" },

@@ -1,4 +1,4 @@
-import { User } from "@/models";
+import { UserModel } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
 const normalizeText = (text: string) => {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists" },
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const parseFirstName = normalizeText(firstName).toLowerCase();
     const parseLastName = normalizeText(lastName).toLowerCase();
 
-    const newUser = new User({
+    const newUser = new UserModel({
       firstName: parseFirstName,
       lastName: parseLastName,
       phonne,

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { User } from "@/models";
+
 import dbConnect from "@/lib/dbConnect";
 import { NextRequest } from "next/server";
+import { UserModel } from "@/models";
 
 export async function GET(request: NextRequest) {
   await dbConnect();
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const users = await User.find({});
+    const users = await UserModel.find({});
     return NextResponse.json({ users: users });
   } catch (error) {
     return NextResponse.json(

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, use } from "react";
 import { AppContext } from "./AppContext";
 import { getCurrentUser } from "@/services/api/user";
-import { User } from "../models/index";
 import { IUserData } from "@/interface/IUserData";
 
 export const AppContextProvider = ({
