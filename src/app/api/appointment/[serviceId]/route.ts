@@ -3,23 +3,23 @@ import dbConnect from "@/lib/dbConnect";
 import { IService } from "@/models/modelService";
 import { AppointmentModel, ServiceModel } from "@/models";
 
-export const dynamic = "force-dynamic";
-
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { serviceId: string } }
+) {
   await dbConnect();
 
   try {
-    // Obtener los parámetros de manera estática
-    const searchParams = new URL(request.url).searchParams;
-    const serviceId = searchParams.get("serviceId");
+    const serviceId = params.serviceId;
+    const { searchParams } = new URL(request.url);
+
     const date = searchParams.get("date");
     const startOfday = searchParams.get("startOfday");
     const endOfday = searchParams.get("endOfday");
 
-    // Validación de parámetros requeridos
     if (!serviceId || !date || !startOfday || !endOfday) {
       return NextResponse.json(
-        { error: "Cannot create appointment, some data is missing" },
+        { error: "Cannot get appointment, some data is missing" },
         { status: 400 }
       );
     }
@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
     }
 
     const serviceDuration = service.duration;
-
     const startDate = new Date(startOfday);
     const endDate = new Date(endOfday);
 
@@ -46,8 +45,14 @@ export async function GET(request: NextRequest) {
     const availableAppointments = [];
     let currentTime = new Date(startDate);
 
+    // Modificación aquí: avanzamos por bloques de la duración del servicio
     while (currentTime < endDate) {
       const endTime = new Date(currentTime.getTime() + serviceDuration * 60000);
+
+      // Si el bloque termina después del horario de cierre, terminamos
+      if (endTime > endDate) {
+        break;
+      }
 
       const isOverlapping = reservedAppointments.some(
         (appointment) =>
@@ -57,22 +62,38 @@ export async function GET(request: NextRequest) {
             endTime <= new Date(appointment.endTime))
       );
 
-      if (!isOverlapping && endTime <= endDate) {
+      if (!isOverlapping) {
         availableAppointments.push({
           startTime: currentTime.toISOString(),
           endTime: endTime.toISOString(),
+          duration: serviceDuration, // añadimos la duración para referencia
         });
       }
 
-      currentTime = new Date(currentTime.getTime() + 60000);
+      // Avanzamos al siguiente bloque según la duración del servicio
+      currentTime = new Date(currentTime.getTime() + serviceDuration * 60000);
     }
 
-    return NextResponse.json({ availableAppointments }, { status: 200 });
-  } catch (error) {
-    console.error("Error creating appointment", error);
     return NextResponse.json(
-      { error: "Error creating appointment" },
+      {
+        availableAppointments,
+        serviceInfo: {
+          name: service.name,
+          duration: serviceDuration,
+          price: service.price,
+        },
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error getting appointment", error);
+    return NextResponse.json(
+      { error: "Error getting appointment" },
       { status: 500 }
     );
   }
 }
+// date": "2024-01-05T00:00:00.000Z",
+//   "startTime": "2024-01-05T09:00:00.000Z",
+//   "endTime": "2024-01-05T10:00:00.000Z",
+//   "userId": "676c8e2cf401a3f7a9ac07a1"

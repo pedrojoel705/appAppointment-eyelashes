@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from "react";
 import { AppContext } from "./AppContext";
-import { getCurrentUser } from "@/services/api/user";
+import { getCurrentUser } from "@/services/api/userFetch";
 import { IUserData } from "@/interface/IUserData";
 
 export const AppContextProvider = ({
@@ -18,7 +18,14 @@ export const AppContextProvider = ({
     const fetchUser = async () => {
       try {
         const userData = await getCurrentUser();
+
         const { user } = userData as IUserData;
+
+        if (!user) {
+          setIsAuthenticated(false);
+          return;
+        }
+
         setUserId(user._id);
         setRole(user.role);
         setIsAuthenticated(true);

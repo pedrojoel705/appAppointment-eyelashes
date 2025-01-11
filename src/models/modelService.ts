@@ -1,6 +1,7 @@
 import { Schema, Document } from "mongoose";
 
 export interface IService extends Document {
+  _id: string;
   category: string;
   name: string;
   description: string;

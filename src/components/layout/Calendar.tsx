@@ -7,7 +7,6 @@ import { enUS } from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Box } from "@mui/system";
 
-// Configuración del localizador
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
   format,
