@@ -10,7 +10,7 @@ export async function GET(
   await dbConnect();
 
   try {
-    const serviceId = params.serviceId;
+    const { serviceId } = await params;
     const { searchParams } = new URL(request.url);
 
     const date = searchParams.get("date");
@@ -93,7 +93,3 @@ export async function GET(
     );
   }
 }
-// date": "2024-01-05T00:00:00.000Z",
-//   "startTime": "2024-01-05T09:00:00.000Z",
-//   "endTime": "2024-01-05T10:00:00.000Z",
-//   "userId": "676c8e2cf401a3f7a9ac07a1"

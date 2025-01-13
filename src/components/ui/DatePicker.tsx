@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -21,23 +22,14 @@ export const DateTimePicker: React.FC<Props> = ({ selectedDate }) => {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          maxWidth: 400,
-          width: { xs: "110%", sm: "100%" },
-          ml: { xs: -2, sm: "auto" },
-          height: "100%",
-          margin: "auto",
-          backgroundColor: "#a08d81",
-          borderRadius: 2,
-          boxShadow: 3,
-          p: 1,
-        }}>
+    <Box
+      sx={{
+        justifyContent: "center",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+      }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <StaticDatePicker
           disablePast
           shouldDisableDate={disablePastDates}
@@ -48,16 +40,14 @@ export const DateTimePicker: React.FC<Props> = ({ selectedDate }) => {
             actionBar: { hidden: true },
           }}
           sx={{
-            width: "100%",
-            "& .MuiPickersCalendarHeader-root": {
-              margin: "0 auto",
-            },
-            "& .MuiDayCalendar-root": {
-              margin: "0 auto",
-            },
+            borderRadius: 2,
+            border: "1px solid #a08d81",
+            boxShadow: 2,
+            minWidth: "250px",
+            margin: "10px",
           }}
         />
-      </Box>
-    </LocalizationProvider>
+      </LocalizationProvider>
+    </Box>
   );
 };

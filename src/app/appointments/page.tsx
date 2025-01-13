@@ -1,16 +1,41 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
+
+import dayjs from "dayjs";
+
 import {
-  Box,
   MenuItem,
   Select,
   Button,
-  Typography,
-  Grid,
   Container,
+  Grid2,
+  styled,
+  useTheme,
+  Theme,
+  CSSObject,
+  Box,
+  List,
+  CssBaseline,
+  Typography,
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton,
 } from "@mui/material";
-import { ResponsiveAppBar } from "@/components/layout/Navbar";
+import MuiDrawer from "@mui/material/Drawer";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import HistoryIcon from "@mui/icons-material/History";
+import PersonIcon from "@mui/icons-material/Person";
+
+import { DateTimePicker } from "@/components/ui/DatePicker";
 import ContainedButton from "@/components/ui/ContainedButton";
 import { getServiceList } from "@/services/api/serviceFetch";
 import { IServiceType } from "@/interface/IServiceData";
@@ -19,13 +44,10 @@ import {
   setAppointment,
 } from "@/services/api/appointmentFetch";
 import { IAppoimentData } from "@/interface/IAppoinmentData";
-import { DateTimePicker } from "@/components/ui/DatePicker";
-import dayjs from "dayjs";
-import { set } from "mongoose";
 
 const formatTimeSlot = (dateString: string) => {
   const date = new Date(dateString);
-  // Ya no necesitamos ajustar la hora aquí, ya que trabajaremos con la hora correcta
+
   return date.toLocaleTimeString("es-ES", {
     hour: "2-digit",
     minute: "2-digit",
@@ -33,18 +55,113 @@ const formatTimeSlot = (dateString: string) => {
   });
 };
 
+const drawerWidth = 240;
+
+const openedMixin = (theme: Theme): CSSObject => ({
+  width: drawerWidth,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
+
+const closedMixin = (theme: Theme): CSSObject => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: `calc(${theme.spacing(8)} + 1px)`,
+  },
+});
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+
+  ...theme.mixins.toolbar,
+}));
+
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
+}
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+}));
+
+const menuItems = [
+  { name: "Turnos", icon: <CalendarTodayIcon />, url: "/turnos" },
+  { name: "Historico", icon: <HistoryIcon />, url: "/historico" },
+  { name: "Perfil", icon: <PersonIcon />, url: "/perfil" },
+];
+const pages = [
+  { title: "Inicio", url: "/" },
+  { title: "Sobre Mi", url: "/about" },
+  { title: "Servicios", url: "/service" },
+  { title: "Contacto", url: "#" },
+];
+
 const AppointmentScheduler: React.FC = () => {
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
   const [selectdDate, setSelectdDate] = useState<dayjs.Dayjs | null>(null);
   const [serviceType, setServiceType] = useState<IServiceType>();
   const [appointmentAvailable, setAppointmentAvailable] =
     useState<IAppoimentData>();
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   const availableSlots =
     appointmentAvailable?.availableAppointments?.map((appointment) =>
       formatTimeSlot(appointment.startTime)
     ) || [];
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
   const handleServiceChange = async (event: any) => {
     const serviceId = event.target.value as string;
@@ -83,7 +200,6 @@ const AppointmentScheduler: React.FC = () => {
     if (!selectdDate) return;
 
     try {
-      // Crear fecha de inicio y fin para el día seleccionado
       const startOfDay = new Date(selectdDate.toDate());
       startOfDay.setHours(9, 0, 0, 0);
 
@@ -104,6 +220,7 @@ const AppointmentScheduler: React.FC = () => {
     }
   };
 
+  //TODO:REVISAR ESTA FUNCION PARA PASAR EL ID DEL USER QUE ESTA LOGUEADO recordar quet tengo userId harcodeado en el fetch de setAppointment
   const fetchSetAppointment = async () => {
     if (!selectdDate || !selectedSlot || !selectedService) return;
 
@@ -147,6 +264,7 @@ const AppointmentScheduler: React.FC = () => {
 
   useEffect(() => {
     fetchServiceData();
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
@@ -156,104 +274,194 @@ const AppointmentScheduler: React.FC = () => {
   }, [selectdDate]);
 
   return (
-    <Box
+    <Container
       sx={{
-        minHeight: "100vh",
         display: "flex",
-        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "start",
+        direction: "column",
+        minHeight: "100vh",
+        paddingBottom: "60px",
+        width: { xs: "100%", sm: "auto" },
       }}>
-      <ResponsiveAppBar />
+      <CssBaseline />
 
-      <Container
-        maxWidth='md'
+      <AppBar
+        position='fixed'
+        open={open}
         sx={{
-          mt: 4,
-          mb: 4,
-          p: 4,
-          backgroundColor: "white",
-          borderRadius: 2,
-          boxShadow: 3,
-          width: { xs: "92%" },
-
-          mx: { xs: 2, sm: 3, md: "auto" },
+          backgroundColor: "#c4b8b0",
         }}>
-        <Typography
-          variant='h5'
-          mb={3}
-          textAlign={{ xs: "center", sm: "left" }}>
-          🌟 ¡Elige el horario perfecto para disfrutar de tu servicio! 🌟
-        </Typography>
-
-        <DateTimePicker
-          selectedDate={(date: dayjs.Dayjs) => setSelectdDate(date)}
-        />
-
-        {/* Selección de servicio */}
-        {selectdDate && (
-          <Box mb={3}>
-            <Typography variant='body1' mb={1}>
-              Selecciona un servicio:
-            </Typography>
-            <Select
-              fullWidth
-              value={selectedService}
-              onChange={(e: any) => handleServiceChange(e)}
-              displayEmpty>
-              <MenuItem value='' disabled>
-                Selecciona un servicio
-              </MenuItem>
-              {serviceType?.map((service) => (
-                <MenuItem key={service._id} value={service._id}>
-                  {service.name} ({service.duration} minutos)
-                </MenuItem>
-              ))}
-            </Select>
+        <Toolbar>
+          <IconButton
+            aria-label='open drawer'
+            onClick={handleDrawerOpen}
+            edge='start'
+            sx={{
+              marginRight: 5,
+              ...(open && { display: "none" }),
+            }}>
+            <MenuIcon />
+          </IconButton>{" "}
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: "flex" },
+              justifyContent: "center",
+            }}>
+            {pages.map((page) => (
+              <Button
+                key={page.title}
+                href={page.url}
+                sx={{ my: 2, mx: 2, color: "black", display: "block" }}>
+                {page.title}
+              </Button>
+            ))}
           </Box>
-        )}
+        </Toolbar>
 
-        {/* Selección de horario */}
-        {selectedService && (
-          <Box mb={3}>
-            <Typography variant='body1' mb={1}>
-              Horarios disponibles:
-            </Typography>
-            <Grid container spacing={2}>
-              {availableSlots.map((slot, index) => (
-                <Grid item xs={6} sm={4} md={3} key={index}>
-                  <Button
-                    variant={selectedSlot === slot ? "contained" : "outlined"}
-                    onClick={() => handleSlotSelect(slot)}
-                    fullWidth
-                    sx={{
-                      textTransform: "none",
-                      color: selectedSlot === slot ? "white" : "#a08d81",
-                      backgroundColor: selectedSlot === slot ? "#a08d81" : "",
-                      borderColor: "#a08d81",
-                      ":hover": {
-                        backgroundColor: "#a08d81",
-                        color: "white",
-                        borderColor: "white",
-                      },
-                    }}>
-                    {slot}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        )}
+        <Grid2></Grid2>
+      </AppBar>
 
-        {/* Botón de confirmación */}
-        <Grid item display='flex' justifyContent='center'>
-          {" "}
-          <ContainedButton
-            onClick={handleConfirm}
-            disabled={!selectedService || !selectedSlot}
-            label='Confirmar reserva'
-          />
-        </Grid>
-      </Container>
-    </Box>
+      <Drawer variant='permanent' open={open} z-index='999'>
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {open ? <ChevronLeftIcon /> : <MenuIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <List>
+          {menuItems.map((item, index) => (
+            <ListItem key={index} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}>
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.name}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+      </Drawer>
+
+      {/* Contenido principal */}
+      <Box
+        sx={{
+          flexGrow: 1, // Esto asegura que el contenido se expanda y empuje al footer
+          paddingTop: 8, // Ajuste para no solaparse con la barra de navegación
+        }}>
+        <DrawerHeader />
+        <Box sx={{ display: "flex", justifyContent: "start" }}>
+          <Typography
+            variant='h5'
+            mb={3}
+            mt={3}
+            textAlign={{ xs: "center", sm: "left" }}>
+            🌟 ¡Elige el horario perfecto para disfrutar de tu servicio! 🌟
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            backgroundColor: "white",
+            borderRadius: 2,
+            boxShadow: 3,
+            padding: { xs: 2, sm: 3 },
+            width: { xs: "340px", sm: "auto" },
+          }}>
+          <Container maxWidth='md' sx={{ width: "100%" }}>
+            {isClient ? (
+              <DateTimePicker selectedDate={(date) => setSelectdDate(date)} />
+            ) : (
+              <Box
+                sx={{ height: "56px", bgcolor: "grey.100", borderRadius: 1 }}
+              />
+            )}
+
+            {/* Selección de servicio */}
+            {selectdDate && (
+              <Box mb={3}>
+                <Typography variant='body1' mb={1}>
+                  Selecciona un servicio:
+                </Typography>
+                <Select
+                  fullWidth
+                  value={selectedService}
+                  onChange={(e: any) => handleServiceChange(e)}
+                  displayEmpty>
+                  <MenuItem value='' disabled>
+                    Selecciona un servicio
+                  </MenuItem>
+                  {serviceType?.map((service) => (
+                    <MenuItem key={service._id} value={service._id}>
+                      {service.name} ({service.duration} minutos)
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Box>
+            )}
+
+            {/* Selección de horario */}
+            {selectedService && (
+              <Box mb={3}>
+                <Typography variant='body1' mb={1}>
+                  Horarios disponibles:
+                </Typography>
+                <Grid2 container spacing={2}>
+                  {availableSlots.map((slot, index) => (
+                    <Grid2 size={{ xs: 6, sm: 4, md: 3 }} key={index}>
+                      <Button
+                        variant={
+                          selectedSlot === slot ? "contained" : "outlined"
+                        }
+                        onClick={() => handleSlotSelect(slot)}
+                        fullWidth
+                        sx={{
+                          textTransform: "none",
+                          color: selectedSlot === slot ? "white" : "#a08d81",
+                          backgroundColor:
+                            selectedSlot === slot ? "#a08d81" : "",
+                          borderColor: "#a08d81",
+                          ":hover": {
+                            backgroundColor: "#a08d81",
+                            color: "white",
+                            borderColor: "white",
+                          },
+                        }}>
+                        {slot}
+                      </Button>
+                    </Grid2>
+                  ))}
+                </Grid2>
+              </Box>
+            )}
+
+            {/* Botón de confirmación */}
+            <Grid2 display='flex' justifyContent='center'>
+              <ContainedButton
+                onClick={handleConfirm}
+                disabled={!selectedService || !selectedSlot}
+                label='Confirmar reserva'
+              />
+            </Grid2>
+          </Container>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

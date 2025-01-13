@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { serviceId: string } }
+  props: { params: Promise<{ serviceId: string }> }
 ) {
+  const params = await props.params;
   try {
-    const serviceId = params.serviceId;
+    const { serviceId } = await params;
     const body = await request.json();
 
     if (!serviceId || !body) {
@@ -24,6 +25,7 @@ export async function POST(
         { status: 400 }
       );
     }
+    console.log("userId", userId);
 
     const newAppointment = await AppointmentModel.create({
       date,

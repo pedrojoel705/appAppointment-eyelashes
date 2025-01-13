@@ -1,7 +1,6 @@
 import { IServiceType } from "@/interface/IServiceData";
 import axiosClient from "../axiosClient";
 import { IAppoimentData } from "@/interface/IAppoinmentData";
-import { set } from "mongoose";
 
 export const getAppointmentAvailable = async (
   serviceId: string,

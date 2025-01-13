@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 export const ConditionalFooter = () => {
   const pathname = usePathname();
 
-  if (pathname === "/admin") {
+  if (pathname === "/admin" || pathname === "/appointments") {
     return null;
   }
 
