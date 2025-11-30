@@ -22,12 +22,12 @@ export const ContentLogin = ({
 }: ILoginFormData) => {
 
   const handleGoogleLogin = () => {
-  signIn("google", { callbackUrl: "/" });
-};
+    signIn("google", { callbackUrl: "/auth-callback" });
+  };
 
-const handleFacebookLogin = () => {
-  signIn("facebook", { callbackUrl: "/" });
-};
+  const handleFacebookLogin = () => {
+    signIn("facebook", { callbackUrl: "/auth-callback" });
+  };
   return (
     <>
       <Box

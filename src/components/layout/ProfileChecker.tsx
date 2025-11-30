@@ -10,13 +10,18 @@ export default function ProfileChecker({ children }: { children: React.ReactNode
   const pathname = usePathname();
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      const needsProfile = (session.user as any).needsProfile;
-      
-      // Si necesita completar el perfil y no está ya en esa página
-      if (needsProfile && pathname !== "/complete-profile") {
-        router.push("/complete-profile");
-      }
+    // Solo verificar en rutas protegidas que requieren perfil completo
+    const protectedRoutes = ["/appointments", "/admin"];
+    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+    
+    if (!isProtectedRoute || status !== "authenticated") {
+      return;
+    }
+
+    // Verificar si tiene teléfono
+    const phone = (session?.user as any)?.phone;
+    if (!phone || phone === "") {
+      router.push("/complete-profile");
     }
   }, [session, status, pathname, router]);
 

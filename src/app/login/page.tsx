@@ -8,7 +8,7 @@ import { useLogin } from "@/hooks/useLogin";
 
 export default function Login() {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
-  const { email, setEmail, password, setPassword, fieldErrors, handleSubmit } = useLogin(showSnackbar);
+  const { email, setEmail, password, setPassword, fieldErrors, handleSubmit } = useLogin(showSnackbar);           
 
   return (
     <Grid2 container justifyContent="center" height="100vh">

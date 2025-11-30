@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
 import {
   Box,
   TextField,
@@ -68,7 +69,8 @@ export default function CompleteProfilePage() {
         throw new Error("Error al actualizar el perfil");
       }
 
-      router.push("/");
+      // Redirigir y recargar sesión
+      window.location.href = "/";
     } catch (err) {
       setError("Error al actualizar el perfil. Intenta de nuevo.");
     } finally {
