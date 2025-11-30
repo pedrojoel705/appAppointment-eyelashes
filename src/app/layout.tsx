@@ -9,6 +9,7 @@ import { Box } from "@mui/system";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { AppContextProvider } from "@/context/AppContextProvider";
 import { SessionProvider } from "@/context/SessionProvider";
+import ProfileChecker from "@/components/layout/ProfileChecker";
 
 export const metadata = {
   title: "Tu Aplicación",
@@ -27,10 +28,12 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             <AppRouterCacheProvider options={{ enableCssLayer: true }}>
               <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <Box sx={{ bgcolor: "#e7dfd8", height: "100%" }}>
-                  {props.children}
-                </Box>
-                <ConditionalFooter />
+                <ProfileChecker>
+                  <Box sx={{ bgcolor: "#e7dfd8", height: "100%" }}>
+                    {props.children}
+                  </Box>
+                  <ConditionalFooter />
+                </ProfileChecker>
               </ThemeProvider>
             </AppRouterCacheProvider>
           </AppContextProvider>

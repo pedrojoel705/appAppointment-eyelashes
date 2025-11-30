@@ -74,11 +74,12 @@ const authOptions: AuthOptions = {
     //   : []),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
         token.phone = (user as any).phone;
+        token.needsProfile = !(user as any).phone; // Marcar si necesita completar perfil
       }
       return token;
     },
@@ -87,6 +88,7 @@ const authOptions: AuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         (session.user as any).phone = (token.phone as string) || "";
+        (session.user as any).needsProfile = token.needsProfile || false;
       }
       return session;
     },

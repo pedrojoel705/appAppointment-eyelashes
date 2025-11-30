@@ -2,8 +2,8 @@ import { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 
 export interface IUser extends Document {
-  firtsName: string;
-  lastName: string;
+  firtsName?: string;
+  lastName?: string;
   phonne?: string;
   email: string;
   password?: string;
@@ -12,8 +12,8 @@ export interface IUser extends Document {
 
 export const UserSchema: Schema = new Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String, required: false, default: "Usuario" },
+    lastName: { type: String, required: false, default: "" },
     phonne: { type: String, required: false, default: "" },
     email: { type: String, required: true, unique: true },
     role: { type: String, required: true, default: "client" },
