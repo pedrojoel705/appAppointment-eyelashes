@@ -47,15 +47,16 @@ const authOptions: AuthOptions = {
         await dbConnect();
         
         try {
+          // Usar la colección directamente para evitar validaciones de Mongoose
+          const usersCollection = mongoose.connection.collection("users");
+          
           // Buscar usuario existente
-          let dbUser = await UserModel.findOne({ email: user.email }).lean();
+          let dbUser = await usersCollection.findOne({ email: user.email });
           
           if (!dbUser) {
             console.log("Usuario no existe, creando nuevo...");
             const [firstName, ...rest] = user.name?.split(" ") || ["Usuario"];
             
-            // Usar la colección directamente para evitar validaciones de Mongoose
-            const usersCollection = mongoose.connection.collection("users");
             const result = await usersCollection.insertOne({
               firstName: firstName || "Usuario",
               lastName: rest.join(" ") || "",
@@ -72,6 +73,11 @@ const authOptions: AuthOptions = {
           }
           
           console.log("DB User phone:", dbUser?.phonne);
+          
+          if (!dbUser) {
+            console.error("Error: Usuario no encontrado después de creación");
+            return false;
+          }
           
           (user as any).dbId = dbUser._id.toString();
           (user as any).phone = dbUser.phonne || "";
