@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { UserModel } from "@/models";
 import dbConnect from "@/lib/dbConnect";
+import mongoose from "mongoose";
 
 const authOptions: AuthOptions = {
   providers: [
@@ -45,40 +46,46 @@ const authOptions: AuthOptions = {
       if (account?.provider === "google") {
         await dbConnect();
         
-        const [firstName, ...rest] = user.name?.split(" ") || ["Usuario"];
-        
-        // Usar findOneAndUpdate con upsert para evitar problemas de validación
-        const dbUser = await UserModel.findOneAndUpdate(
-          { email: user.email },
-          {
-            $setOnInsert: {
+        try {
+          // Buscar usuario existente
+          let dbUser = await UserModel.findOne({ email: user.email }).lean();
+          
+          if (!dbUser) {
+            console.log("Usuario no existe, creando nuevo...");
+            const [firstName, ...rest] = user.name?.split(" ") || ["Usuario"];
+            
+            // Usar la colección directamente para evitar validaciones de Mongoose
+            const usersCollection = mongoose.connection.collection("users");
+            const result = await usersCollection.insertOne({
               firstName: firstName || "Usuario",
               lastName: rest.join(" ") || "",
               email: user.email,
               phonne: "",
               role: "client",
-            }
-          },
-          { 
-            upsert: true, 
-            new: true,
-            runValidators: false, // Ignorar validaciones
-            setDefaultsOnInsert: true
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            
+            // Recuperar el usuario creado
+            dbUser = await usersCollection.findOne({ _id: result.insertedId });
+            console.log("Usuario creado exitosamente");
           }
-        );
-        
-        console.log("DB User:", dbUser ? "Found/Created" : "Error");
-        console.log("DB User phone:", dbUser?.phonne);
-        
-        (user as any).dbId = (dbUser._id as any).toString();
-        (user as any).phone = dbUser.phonne || "";
-        (user as any).role = dbUser.role;
-        
-        console.log("User object after signIn:", {
-          dbId: (user as any).dbId,
-          phone: (user as any).phone,
-          role: (user as any).role
-        });
+          
+          console.log("DB User phone:", dbUser?.phonne);
+          
+          (user as any).dbId = dbUser._id.toString();
+          (user as any).phone = dbUser.phonne || "";
+          (user as any).role = dbUser.role;
+          
+          console.log("User object after signIn:", {
+            dbId: (user as any).dbId,
+            phone: (user as any).phone,
+            role: (user as any).role
+          });
+        } catch (error) {
+          console.error("Error in signIn callback:", error);
+          return false;
+        }
       }
       
       return true;
