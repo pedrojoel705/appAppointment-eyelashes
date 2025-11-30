@@ -3,10 +3,9 @@ import { IUser, UserSchema } from "@/models/modelUser";
 import { AppointmentsSchema, IAppointments } from "./modelAppointment";
 import { IService, ServiceSchema } from "./modelService";
 
-// Borrar el modelo existente si existe para forzar recreación
-if (mongoose.models.User) {
-  delete mongoose.models.User;
-}
+// Forzar recreación del modelo en cada import
+delete mongoose.models.User;
+delete (mongoose.connection.models as any).User;
 
 export const UserModel = mongoose.model<IUser>("User", UserSchema);
 
