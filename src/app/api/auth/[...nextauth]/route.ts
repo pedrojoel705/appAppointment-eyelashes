@@ -91,33 +91,38 @@ const authOptions: AuthOptions = {
       return session;
     },
     async signIn({ user, account, profile }) {
-      // Para OAuth providers (Google, Facebook)
-      if (account?.provider !== "credentials") {
-        await dbConnect();
+      try {
+        // Para OAuth providers (Google, Facebook)
+        if (account?.provider !== "credentials") {
+          await dbConnect();
 
-        // Verificar si el usuario ya existe
-        let existingUser = await UserModel.findOne({ email: user.email });
+          // Verificar si el usuario ya existe
+          let existingUser = await UserModel.findOne({ email: user.email });
 
-        if (!existingUser) {
-          // Crear nuevo usuario desde OAuth
-          const nameParts = user.name?.split(" ") || ["", ""];
-          existingUser = await UserModel.create({
-            email: user.email,
-            firtsName: nameParts[0],
-            lastName: nameParts.slice(1).join(" ") || nameParts[0],
-            phonne: "",
-            password: Math.random().toString(36).slice(-8), // Password temporal para OAuth users
-            role: "client",
-          });
+          if (!existingUser) {
+            // Crear nuevo usuario desde OAuth
+            const nameParts = user.name?.split(" ") || ["", ""];
+            existingUser = await UserModel.create({
+              email: user.email,
+              firtsName: nameParts[0] || "Usuario",
+              lastName: nameParts.slice(1).join(" ") || "OAuth",
+              phonne: "",
+              password: Math.random().toString(36).slice(-8), // Password temporal para OAuth users
+              role: "client",
+            });
+          }
+
+          // Actualizar el objeto user con datos de la base de datos
+          user.id = existingUser._id.toString();
+          (user as any).role = existingUser.role;
+          (user as any).phone = existingUser.phonne || "";
         }
 
-        // Actualizar el objeto user con datos de la base de datos
-        user.id = existingUser._id.toString();
-        (user as any).role = existingUser.role;
-        (user as any).phone = existingUser.phonne;
+        return true;
+      } catch (error) {
+        console.error("Error en signIn callback:", error);
+        return false;
       }
-
-      return true;
     }
   },
   pages: {
