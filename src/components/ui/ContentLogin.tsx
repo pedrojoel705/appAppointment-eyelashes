@@ -11,10 +11,17 @@ export const ContentLogin = ({fieldErrors, email, setEmail, password, setPasswor
   
   const handleGoogleLogin = async () => {
     try {
-      await signIn("google", { 
+      const result = await signIn("google", { 
         callbackUrl: "/",
-        redirect: true,
+        redirect: false,
       });
+      
+      if (result?.error) {
+        console.error("Error en Google login:", result.error);
+        showSnackbar("Error al iniciar sesión con Google. Por favor, intenta de nuevo.", "error");
+      } else if (result?.url) {
+        window.location.href = result.url;
+      }
     } catch (error) {
       console.error("Error en Google login:", error);
       showSnackbar("Error al iniciar sesión con Google", "error");

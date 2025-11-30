@@ -92,44 +92,46 @@ const authOptions: AuthOptions = {
     },
     async signIn({ user, account, profile }) {
       try {
-        // Para OAuth providers (Google, Facebook)
         if (account?.provider !== "credentials") {
+          // Para OAuth providers, crear/actualizar usuario en la base de datos
           await dbConnect();
-
-          // Verificar si el usuario ya existe
+          
           const existingUser = await UserModel.findOne({ email: user.email });
-
-          if (existingUser) {
-            // Usuario existe, actualizar datos
-            user.id = existingUser._id.toString();
-            (user as any).role = existingUser.role;
-            (user as any).phone = existingUser.phonne || "";
-          } else {
-            // Usuario no existe, usar datos por defecto
-            (user as any).role = "client";
-            (user as any).phone = "";
+          
+          if (!existingUser) {
+            // Crear nuevo usuario desde OAuth
+            const nameParts = (user.name || "").split(" ");
+            const firstName = nameParts[0] || "Usuario";
+            const lastName = nameParts.slice(1).join(" ") || "OAuth";
+            
+            await UserModel.create({
+              firstName: firstName,
+              lastName: lastName,
+              email: user.email,
+              phonne: "", // OAuth no proporciona teléfono
+              password: Math.random().toString(36).slice(-8), // Password aleatorio (no se usará)
+              role: "client",
+            });
           }
+          
+          (user as any).role = existingUser?.role || "client";
+          (user as any).phone = existingUser?.phonne || "";
         }
-
         return true;
       } catch (error) {
-        console.error("Error en signIn callback:", error);
-        // Permitir el login incluso si hay error de DB
-        (user as any).role = "client";
-        (user as any).phone = "";
-        return true;
+        console.error("Error in signIn callback:", error);
+        return false;
       }
     }
   },
   pages: {
     signIn: "/login",
-    error: "/login",
   },
   session: {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === "development",
+  debug: false,
 };
 
 const handler = NextAuth(authOptions);
