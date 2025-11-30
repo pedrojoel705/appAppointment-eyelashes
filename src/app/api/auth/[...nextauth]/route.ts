@@ -94,17 +94,25 @@ const authOptions: AuthOptions = {
     },
     async signIn({ user, account, profile }) {
       try {
+        console.log("=== SIGNIN CALLBACK ===");
+        console.log("Provider:", account?.provider);
+        console.log("User:", JSON.stringify(user, null, 2));
+        console.log("Profile:", JSON.stringify(profile, null, 2));
+        
         if (account?.provider !== "credentials") {
           // Para OAuth providers, crear/actualizar usuario en la base de datos
           await dbConnect();
           
           const existingUser = await UserModel.findOne({ email: user.email });
+          console.log("Existing user:", existingUser ? "Found" : "Not found");
           
           if (!existingUser) {
             // Crear nuevo usuario desde OAuth
             const nameParts = (user.name || "").split(" ");
             const firstName = nameParts[0] || "Usuario";
             const lastName = nameParts.slice(1).join(" ") || "OAuth";
+            
+            console.log("Creating new user:", { firstName, lastName, email: user.email });
             
             await UserModel.create({
               firstName: firstName,
@@ -114,6 +122,8 @@ const authOptions: AuthOptions = {
               role: "client",
               // password no es necesario para usuarios OAuth
             });
+            
+            console.log("User created successfully");
           }
           
           (user as any).role = existingUser?.role || "client";

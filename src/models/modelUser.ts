@@ -20,7 +20,10 @@ export const UserSchema: Schema = new Schema(
     role: { type: String, required: true, default: "client" },
     password: { type: String, required: false },
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    strict: false // Permitir campos adicionales temporalmente
+  }
 );
 
 UserSchema.pre("save", async function (next) {
