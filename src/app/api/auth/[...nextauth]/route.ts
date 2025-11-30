@@ -24,17 +24,17 @@ const authOptions: AuthOptions = {
           throw new Error("Usuario no encontrado");
         }
 
-        const isValid = await user.comparePassword(credentials.password);
+        const isValid = await user.comparePassword(credentials.password || "");
         if (!isValid) {
           throw new Error("Contraseña incorrecta");
         }
 
         return {
-          id: user._id.toString(),
+          id: (user._id as any).toString(),
           email: user.email,
-          name: `${user.firstName} ${user.lastName}`,
+          name: `${user.firstName || ""} ${user.lastName || ""}`,
           role: user.role,
-          phone: user.phonne,
+          phone: user.phonne || "",
         } as any;
       }
     }),
@@ -94,25 +94,17 @@ const authOptions: AuthOptions = {
     },
     async signIn({ user, account, profile }) {
       try {
-        console.log("=== SIGNIN CALLBACK ===");
-        console.log("Provider:", account?.provider);
-        console.log("User:", JSON.stringify(user, null, 2));
-        console.log("Profile:", JSON.stringify(profile, null, 2));
-        
         if (account?.provider !== "credentials") {
           // Para OAuth providers, crear/actualizar usuario en la base de datos
           await dbConnect();
           
           const existingUser = await UserModel.findOne({ email: user.email });
-          console.log("Existing user:", existingUser ? "Found" : "Not found");
           
           if (!existingUser) {
             // Crear nuevo usuario desde OAuth
             const nameParts = (user.name || "").split(" ");
             const firstName = nameParts[0] || "Usuario";
             const lastName = nameParts.slice(1).join(" ") || "OAuth";
-            
-            console.log("Creating new user:", { firstName, lastName, email: user.email });
             
             await UserModel.create({
               firstName: firstName,
@@ -122,8 +114,6 @@ const authOptions: AuthOptions = {
               role: "client",
               // password no es necesario para usuarios OAuth
             });
-            
-            console.log("User created successfully");
           }
           
           (user as any).role = existingUser?.role || "client";
@@ -138,6 +128,7 @@ const authOptions: AuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   session: {
     strategy: "jwt",

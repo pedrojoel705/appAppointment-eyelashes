@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       email: user.email,
-      passwordHash: user.password.substring(0, 30) + "...", // Solo primeros 30 caracteres
+      passwordHash: user.password ? user.password.substring(0, 30) + "..." : "No password set",
       passwordMatch: isValid,
       hasCompareMethod: typeof user.comparePassword === 'function'
     });
