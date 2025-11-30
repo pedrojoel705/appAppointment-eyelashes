@@ -108,9 +108,9 @@ const authOptions: AuthOptions = {
               firstName: firstName,
               lastName: lastName,
               email: user.email,
-              phonne: "", // OAuth no proporciona teléfono
-              password: Math.random().toString(36).slice(-8), // Password aleatorio (no se usará)
+              phonne: "", // OAuth no proporciona teléfono (ahora opcional)
               role: "client",
+              // password no es necesario para usuarios OAuth
             });
           }
           
