@@ -45,22 +45,30 @@ const authOptions: AuthOptions = {
       if (account?.provider === "google") {
         await dbConnect();
         
-        let dbUser = await UserModel.findOne({ email: user.email });
-        console.log("User exists in DB:", !!dbUser);
+        const [firstName, ...rest] = user.name?.split(" ") || ["Usuario"];
         
-        if (!dbUser) {
-          const [firstName, ...rest] = user.name?.split(" ") || ["Usuario"];
-          dbUser = await UserModel.create({
-            firstName,
-            lastName: rest.join(" ") || "",
-            email: user.email,
-            phonne: "",
-            role: "client",
-          });
-          console.log("New user created");
-        }
+        // Usar findOneAndUpdate con upsert para evitar problemas de validación
+        const dbUser = await UserModel.findOneAndUpdate(
+          { email: user.email },
+          {
+            $setOnInsert: {
+              firstName: firstName || "Usuario",
+              lastName: rest.join(" ") || "",
+              email: user.email,
+              phonne: "",
+              role: "client",
+            }
+          },
+          { 
+            upsert: true, 
+            new: true,
+            runValidators: false, // Ignorar validaciones
+            setDefaultsOnInsert: true
+          }
+        );
         
-        console.log("DB User phone:", dbUser.phonne);
+        console.log("DB User:", dbUser ? "Found/Created" : "Error");
+        console.log("DB User phone:", dbUser?.phonne);
         
         (user as any).dbId = (dbUser._id as any).toString();
         (user as any).phone = dbUser.phonne || "";
