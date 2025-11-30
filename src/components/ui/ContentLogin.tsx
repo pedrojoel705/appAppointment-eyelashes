@@ -9,11 +9,16 @@ import { signIn } from "next-auth/react";
 
 export const ContentLogin = ({fieldErrors, email, setEmail, password, setPassword, handleSubmit, showSnackbar}: ILoginFormData) => {
   
-  const handleGoogleLogin = () => {
-    signIn("google", { 
-      callbackUrl: "/",
-      redirect: true,
-    });
+  const handleGoogleLogin = async () => {
+    try {
+      await signIn("google", { 
+        callbackUrl: "/",
+        redirect: true,
+      });
+    } catch (error) {
+      console.error("Error en Google login:", error);
+      showSnackbar("Error al iniciar sesión con Google", "error");
+    }
   };
 
   const handleFacebookLogin = () => {
