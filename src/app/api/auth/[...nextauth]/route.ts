@@ -97,31 +97,27 @@ const authOptions: AuthOptions = {
           await dbConnect();
 
           // Verificar si el usuario ya existe
-          let existingUser = await UserModel.findOne({ email: user.email });
+          const existingUser = await UserModel.findOne({ email: user.email });
 
-          if (!existingUser) {
-            // Crear nuevo usuario desde OAuth
-            const nameParts = user.name?.split(" ") || ["", ""];
-            existingUser = await UserModel.create({
-              email: user.email,
-              firtsName: nameParts[0] || "Usuario",
-              lastName: nameParts.slice(1).join(" ") || "OAuth",
-              phonne: "",
-              password: Math.random().toString(36).slice(-8), // Password temporal para OAuth users
-              role: "client",
-            });
+          if (existingUser) {
+            // Usuario existe, actualizar datos
+            user.id = existingUser._id.toString();
+            (user as any).role = existingUser.role;
+            (user as any).phone = existingUser.phonne || "";
+          } else {
+            // Usuario no existe, usar datos por defecto
+            (user as any).role = "client";
+            (user as any).phone = "";
           }
-
-          // Actualizar el objeto user con datos de la base de datos
-          user.id = existingUser._id.toString();
-          (user as any).role = existingUser.role;
-          (user as any).phone = existingUser.phonne || "";
         }
 
         return true;
       } catch (error) {
         console.error("Error en signIn callback:", error);
-        return false;
+        // Permitir el login incluso si hay error de DB
+        (user as any).role = "client";
+        (user as any).phone = "";
+        return true;
       }
     }
   },
