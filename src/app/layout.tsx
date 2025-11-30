@@ -8,6 +8,7 @@ import theme from "@/theme";
 import { Box } from "@mui/system";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { AppContextProvider } from "@/context/AppContextProvider";
+import { SessionProvider } from "@/context/SessionProvider";
 
 export const metadata = {
   title: "Tu Aplicación",
@@ -21,17 +22,19 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <meta charSet='utf-8' />
       </head>
       <body>
-        <AppContextProvider>
-          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <Box sx={{ bgcolor: "#e7dfd8", height: "100%" }}>
-                {props.children}
-              </Box>
-              <ConditionalFooter />
-            </ThemeProvider>
-          </AppRouterCacheProvider>
-        </AppContextProvider>
+        <SessionProvider>
+          <AppContextProvider>
+            <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Box sx={{ bgcolor: "#e7dfd8", height: "100%" }}>
+                  {props.children}
+                </Box>
+                <ConditionalFooter />
+              </ThemeProvider>
+            </AppRouterCacheProvider>
+          </AppContextProvider>
+        </SessionProvider>
       </body>
     </html>
   );

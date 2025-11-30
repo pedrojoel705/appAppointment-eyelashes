@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const users = await UserModel.find({});
+
+    console.log(users,"esta logueado")
     return NextResponse.json({ users: users });
   } catch (error) {
     return NextResponse.json(

@@ -15,27 +15,29 @@ export const AppContextProvider = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getCurrentUser();
+    // const fetchUser = async () => {
+    //   try {
+    //     const userData = await getCurrentUser();
 
-        const { user } = userData as IUserData;
+    //     const { user } = userData as IUserData;
 
-        if (!user) {
-          setIsAuthenticated(false);
-          return;
-        }
+      
 
-        setUserId(user._id);
-        setRole(user.role);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error("Error getting current user", error);
-        setIsAuthenticated(false);
-      }
-    };
+    //     // if (!user) {
+    //     //   setIsAuthenticated(false);
+    //     //   return;
+    //     // }
 
-    fetchUser();
+    //     setUserId(user._id);
+    //     setRole(user.role);
+    //     setIsAuthenticated(true);
+    //   } catch (error) {
+    //     console.error("Error getting current user", error);
+    //     setIsAuthenticated(false);
+    //   }
+    // };
+
+    // fetchUser();
   }, []);
 
   const logout = () => {

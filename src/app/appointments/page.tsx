@@ -181,7 +181,7 @@ const AppointmentScheduler: React.FC = () => {
     try {
       if (selectedService && selectedSlot && selectdDate) {
         await fetchSetAppointment();
-        const service = serviceType?.find((s) => s._id === selectedService);
+        const service = serviceType?.find((s: any) => s._id === selectedService);
         setSelectedSlot(null);
         setSelectedService("");
         setSelectdDate(null);

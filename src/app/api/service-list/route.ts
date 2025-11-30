@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import { ServiceModel } from "@/models";
+import { cleanDigitSectionValue } from "@mui/x-date-pickers/internals/hooks/useField/useField.utils";
 
 export async function GET(request: NextRequest) {
   await dbConnect();
 
   try {
     const service = await ServiceModel.find({});
+    
+    console.log("service", service);
+
+    // cleanDigitSectionValue
     return NextResponse.json({ service });
   } catch (error) {
     return NextResponse.json(

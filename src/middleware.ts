@@ -1,28 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   try {
-    const token = request.cookies.get("token")?.value;
+    const token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET 
+    });
 
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET no está definido");
-    }
-
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(process.env.JWT_SECRET)
-    );
-
     const response = NextResponse.next();
 
-    response.headers.set("userId", payload.userId as string);
-    response.headers.set("userRole", payload.role as string);
+    response.headers.set("userId", token.id as string);
+    response.headers.set("userRole", token.role as string);
 
     return response;
   } catch (error: any) {
@@ -32,5 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/user/getUser", "/api/user"],
+  matcher: ["/api/user/getUser", "/api/user", "/admin/:path*", "/appointments/:path*"],
 };
