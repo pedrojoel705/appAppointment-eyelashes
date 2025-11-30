@@ -47,7 +47,7 @@ export async function GET() {
   try {
     await dbConnect();
 
-    const users = await UserModel.find({}, { email: 1, firtsName: 1, lastName: 1, role: 1 });
+    const users = await UserModel.find({}, { email: 1, firstName: 1, lastName: 1, role: 1 });
 
     return NextResponse.json({ users });
   } catch (error: any) {

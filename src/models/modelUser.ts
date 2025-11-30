@@ -2,12 +2,13 @@ import { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 
 export interface IUser extends Document {
-  firtsName?: string;
+  firstName?: string;
   lastName?: string;
   phonne?: string;
   email: string;
   password?: string;
   role: string;
+  comparePassword(password: string): Promise<boolean>;
 }
 
 export const UserSchema: Schema = new Schema(

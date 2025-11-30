@@ -32,7 +32,7 @@ const authOptions: AuthOptions = {
         return {
           id: user._id.toString(),
           email: user.email,
-          name: `${user.firtsName} ${user.lastName}`,
+          name: `${user.firstName} ${user.lastName}`,
           role: user.role,
           phone: user.phonne,
         } as any;
