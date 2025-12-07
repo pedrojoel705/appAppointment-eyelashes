@@ -86,7 +86,8 @@ const authOptions: AuthOptions = {
           console.log("User object after signIn:", {
             dbId: (user as any).dbId,
             phone: (user as any).phone,
-            role: (user as any).role
+            role: (user as any).role,
+            image: user.image
           });
         } catch (error) {
           console.error("Error in signIn callback:", error);
@@ -105,6 +106,7 @@ const authOptions: AuthOptions = {
         token.id = (user as any).dbId || user.id;
         token.phone = (user as any).phone || "";
         token.role = (user as any).role || "client";
+        token.image = user.image || "";
       }
 
       // Actualizar token cuando se llama update() desde el cliente
@@ -123,6 +125,7 @@ const authOptions: AuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.image = token.image as string;
         (session.user as any).phone = token.phone || "";
       }
       
