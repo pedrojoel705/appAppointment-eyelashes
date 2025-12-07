@@ -21,7 +21,7 @@ const pages = [
   { title: "Sobre Mi", url: "/about" },
   { title: "Servicios", url: "/service" },
   { title: "Contacto", url: "#" },
-  { title: "Turnos", url: "/appointments" },
+  { title: "Turnos", url: "/appointments", isvisible: true },
 ];
 const settings = [
   { title: "Perfil", action: "profile" },
@@ -62,7 +62,7 @@ export const ResponsiveAppBar = () => {
     }
   };
 
-  // Obtener iniciales del nombre para el avatar
+  
   const getInitials = () => {
     if (!session?.user?.name) return "U";
     const names = session.user.name.split(" ");
@@ -120,28 +120,40 @@ export const ResponsiveAppBar = () => {
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: "block", md: "none" } }}>
-              {pages.map((page) => (
-                <MenuItem key={page.title} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {page.title}
-                  </Typography>
-                </MenuItem>
-              ))}
+              {pages.map((page) => {
+                // Ocultar "Turnos" si no hay sesión activa
+                if (page.title === "Turnos" && !session?.user) {
+                  return null;
+                }
+                return (
+                  <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+                    <Typography sx={{ textAlign: "center" }}>
+                      {page.title}
+                    </Typography>
+                  </MenuItem>
+                );
+              })}
             </Menu>
           </Box>
           <Box sx={{ flexGrow: 0.9, display: { xs: "felx", md: "none" } }}>
             <Logo />
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Button
-                key={page.title}
-                onClick={handleCloseNavMenu}
-                href={page.url}
-                sx={{ my: 2, mx: 2, color: "black", display: "block" }}>
-                {page.title}
-              </Button>
-            ))}
+            {pages.map((page) => {
+              // Ocultar "Turnos" si no hay sesión activa
+              if (page.title === "Turnos" && !session?.user) {
+                return null;
+              }
+              return (
+                <Button
+                  key={page.title}
+                  onClick={handleCloseNavMenu}
+                  href={page.url}
+                  sx={{ my: 2, mx: 2, color: "black", display: "block" }}>
+                  {page.title}
+                </Button>
+              );
+            })}
           </Box>
           <Box>
             {session?.user ? (

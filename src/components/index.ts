@@ -7,5 +7,6 @@ export { ButtonContained } from './layout/ButtonContained';
 export { CalendarComponent } from './ui/Calendar';
 export { DateTimePicker } from './ui/DatePicker';
 export { default as ContentAbout } from './ui/ContentAbout';
+export { ResponsiveAppBar } from './layout/Navbar';
 
 
