@@ -36,7 +36,6 @@ import HistoryIcon from "@mui/icons-material/History";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { DateTimePicker } from "@/components/ui/DatePicker";
-import ContainedButton from "@/components/ui/ContainedButton";
 import { getServiceList } from "@/services/api/serviceFetch";
 import { IServiceType } from "@/interface/IServiceData";
 import {
@@ -452,11 +451,14 @@ const AppointmentScheduler: React.FC = () => {
 
             {/* Botón de confirmación */}
             <Grid2 display='flex' justifyContent='center'>
-              <ContainedButton
+              <Button
                 onClick={handleConfirm}
                 disabled={!selectedService || !selectedSlot}
-                label='Confirmar reserva'
-              />
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Confirmar reserva
+              </Button>
             </Grid2>
           </Container>
         </Box>
