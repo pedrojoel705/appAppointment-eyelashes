@@ -97,7 +97,7 @@ const authOptions: AuthOptions = {
       return true;
     },
     
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       console.log("=== JWT CALLBACK ===");
       
       if (user) {
@@ -105,6 +105,12 @@ const authOptions: AuthOptions = {
         token.id = (user as any).dbId || user.id;
         token.phone = (user as any).phone || "";
         token.role = (user as any).role || "client";
+      }
+
+      // Actualizar token cuando se llama update() desde el cliente
+      if (trigger === "update" && session) {
+        console.log("Updating token with new session data");
+        token.phone = session.user?.phone || token.phone;
       }
       
       console.log("Token:", { id: token.id, phone: token.phone, role: token.role });

@@ -7,7 +7,7 @@ import {
   Grid,
 } from "@mui/material";
 
-const cardData = [
+export const cardData = [
   {
     title: "Eyelash Extensions",
     description:

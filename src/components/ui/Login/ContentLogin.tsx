@@ -11,6 +11,8 @@ import { ILoginFormData } from "@/interface/ILoginFormData";
 import { SocialMediaLogin } from "./SocialMediaLogin";
 import { FooterLogin } from "./FooterLogin";
 import { signIn } from "next-auth/react";
+import { ButtonContained } from "@/components";
+
 
 export const ContentLogin = ({
   fieldErrors,
@@ -19,6 +21,7 @@ export const ContentLogin = ({
   password,
   setPassword,
   handleSubmit,
+  loading,
 }: ILoginFormData) => {
 
   const handleGoogleLogin = () => {
@@ -64,6 +67,7 @@ export const ContentLogin = ({
             onChange={(e) => setEmail(e.target.value)}
             error={!!fieldErrors.email}
             helperText={fieldErrors.email}
+            disabled={loading}
           />
           <TextField
             margin="normal"
@@ -78,15 +82,13 @@ export const ContentLogin = ({
             onChange={(e) => setPassword(e.target.value)}
             error={!!fieldErrors.password}
             helperText={fieldErrors.password}
+            disabled={loading}
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Iniciar sesión
-          </Button>
+         <ButtonContained
+          loading={loading}
+          accionText="Iniciando sesión..."
+          text="Iniciar sesión"
+        />
 
           <Divider sx={{ my: 2 }}>O continúa con</Divider>
 

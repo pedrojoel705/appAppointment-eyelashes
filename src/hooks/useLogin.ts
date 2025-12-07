@@ -12,6 +12,7 @@ export const useLogin = (showSnackbar: (message: string, severity: AlertColor) =
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const validateFields = (): boolean => {
@@ -33,10 +34,11 @@ export const useLogin = (showSnackbar: (message: string, severity: AlertColor) =
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateFields()) {
-      showSnackbar("Por favor, complete todos los campos correctamente", "warning");
+      showSnackbar("Por favor, complete todos los campos correctamente", "error");
       return;
     }
 
+    setLoading(true);
     try {
       const result = await signIn("credentials", {
         email,
@@ -49,16 +51,18 @@ export const useLogin = (showSnackbar: (message: string, severity: AlertColor) =
 
       if (result?.ok) {
         showSnackbar("Inicio de sesión exitoso", "success");
-        setTimeout(() => router.push("/"), 1500);
+        setTimeout(() => router.push("/"), 1000);
       } else if (result?.error) {
         console.error("Error de autenticación:", result.error);
         showSnackbar("Credenciales incorrectas", "error");
+        setLoading(false);
       }
     } catch (error: any) {
       console.error("Error en login:", error);
       showSnackbar(`Error inesperado: ${error.message}`, "error");
+      setLoading(false);
     }
   };
 
-  return { email, setEmail, password, setPassword, fieldErrors, handleSubmit };
+  return { email, setEmail, password, setPassword, fieldErrors, loading, handleSubmit };
 };

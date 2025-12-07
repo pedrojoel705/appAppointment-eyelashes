@@ -5,24 +5,30 @@ import { CustomSnackbar } from "@/components/ui/CustomSnackbar";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { ContentLogin } from "@/components/ui/Login/ContentLogin";
 import { useLogin } from "@/hooks/useLogin";
+import { LoadingBackdrop } from "@/components/ui/LoadingBackdrop";
 
 export default function Login() {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
-  const { email, setEmail, password, setPassword, fieldErrors, handleSubmit } = useLogin(showSnackbar);           
+  const { email, setEmail, password, setPassword, fieldErrors, loading, handleSubmit } = useLogin(showSnackbar);           
 
   return (
-    <Grid2 container justifyContent="center" height="100vh">
-      <ResponsiveAppBar />
-      <ContentLogin
-        fieldErrors={fieldErrors}
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        handleSubmit={handleSubmit}
-        showSnackbar={showSnackbar}
-      />
-      <CustomSnackbar snackbar={snackbar} onClose={hideSnackbar} />
-    </Grid2>
+    <>
+      <LoadingBackdrop open={loading} message="Iniciando sesión..." />
+      
+      <Grid2 container justifyContent="center" height="100vh">
+        <ResponsiveAppBar />
+        <ContentLogin
+          fieldErrors={fieldErrors}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          handleSubmit={handleSubmit}
+          showSnackbar={showSnackbar}
+          loading={loading}
+        />
+        <CustomSnackbar snackbar={snackbar} onClose={hideSnackbar} />
+      </Grid2>
+    </>
   );
 }

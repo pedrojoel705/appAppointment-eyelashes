@@ -11,6 +11,7 @@ export interface ILoginFormData {
   setPassword: React.Dispatch<React.SetStateAction<string>>;  
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   showSnackbar: (message: string, severity: AlertColor) => void;
+  loading: boolean;
 }
 
 

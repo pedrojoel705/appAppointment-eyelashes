@@ -14,6 +14,8 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Logo } from "../ui/Logo";
 import { Tilt_Neon } from "next/font/google";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const pages = [
   { title: "Sobre Mi", url: "/about" },
@@ -21,9 +23,14 @@ const pages = [
   { title: "Contacto", url: "#" },
   { title: "Turnos", url: "/appointments" },
 ];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = [
+  { title: "Perfil", action: "profile" },
+  { title: "Cerrar Sesión", action: "logout" },
+];
 
 export const ResponsiveAppBar = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -44,6 +51,25 @@ export const ResponsiveAppBar = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleSettingClick = (action: string) => {
+    handleCloseUserMenu();
+    if (action === "logout") {
+      signOut({ callbackUrl: "/login" });
+    } else if (action === "profile") {
+      router.push("/profile");
+    }
+  };
+
+  // Obtener iniciales del nombre para el avatar
+  const getInitials = () => {
+    if (!session?.user?.name) return "U";
+    const names = session.user.name.split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
   };
 
   return (
@@ -118,34 +144,61 @@ export const ResponsiveAppBar = () => {
             ))}
           </Box>
           <Box>
-            <Tooltip title='Open settings'>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id='menu-appbar'
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}>
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+            {session?.user ? (
+              <>
+                <Tooltip title={session.user.name || "Usuario"}>
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    {session.user.image ? (
+                      <Avatar 
+                        alt={session.user.name || "Usuario"} 
+                        src={session.user.image}
+                      />
+                    ) : (
+                      <Avatar sx={{ bgcolor: "secondary.main" }}>
+                        {getInitials()}
+                      </Avatar>
+                    )}
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}>
+                  <Box sx={{ px: 2, py: 1, borderBottom: "1px solid #e0e0e0" }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {session.user.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {session.user.email}
+                    </Typography>
+                  </Box>
+                  {settings.map((setting) => (
+                    <MenuItem key={setting.action} onClick={() => handleSettingClick(setting.action)}>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {setting.title}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
+            ) : (
+              <Button
+                onClick={() => router.push("/login")}
+                sx={{ color: "black" }}>
+                Iniciar Sesión
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </Container>

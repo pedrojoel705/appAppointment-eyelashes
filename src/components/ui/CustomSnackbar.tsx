@@ -13,7 +13,11 @@ export const CustomSnackbar: React.FC<CustomSnackbarProps> = ({
   onClose,
 }) => {
   return (
-    <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={onClose}>
+    <Snackbar 
+      open={snackbar.open} 
+      autoHideDuration={6000} 
+      onClose={onClose}
+    >
       <Alert
         onClose={onClose}
         severity={snackbar.severity}
